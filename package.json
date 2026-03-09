@@ -1,4 +1,16 @@
 {
+  "name": "backend_assignment_03",
+  "version": "1.0.0",
+  "description": "High-Risk Loan Monitoring API",
+  "main": "dist/server.js",
+  "scripts": {
+    "dev": "nodemon --exec ts-node src/server.ts",
+    "build": "tsc",
+    "start": "node dist/server.js",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage"
+  },
   "dependencies": {
     "express": "^5.2.1",
     "firebase-admin": "^13.7.0",
@@ -16,11 +28,4 @@
     "typescript": "^5.9.3"
   }
 }
-"scripts": {
-  "dev": "nodemon --exec ts-node src/server.ts",
-  "build": "tsc",
-  "start": "node dist/server.js",
-  "test": "jest",
-  "test:watch": "jest --watch",
-  "test:coverage": "jest --coverage"
-}
+
