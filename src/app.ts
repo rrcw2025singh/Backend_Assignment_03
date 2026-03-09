@@ -1,8 +1,10 @@
 import express, { Application } from "express";
+import { consoleLogger } from "./api/v1/middleware/logger";
 import healthRoutes from "./api/v1/routes/healthRoutes";
 import loanRoutes from "./api/v1/routes/loanRoutes";
 
 const app: Application = express();
+app.use(consoleLogger);
 
 app.use(express.json());
 app.use("/api/v1", healthRoutes);
