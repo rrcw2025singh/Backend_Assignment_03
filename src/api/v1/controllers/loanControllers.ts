@@ -1,16 +1,23 @@
 import { Request, Response } from "express";
-import { LoanApplication } from "../models/loanmodel";
 
-const loans: LoanApplication[] = [
+interface LoanApplication {
+    id: number;
+    applicant: string;
+    amount: number;
+    status: "pending" | "under_review" | "flagged" | "approved" | "rejected";
+    createdAt: string;
+}
+
+let loans: LoanApplication[] = [
     {
-        id: "1",
+        id: 1,
         applicant: "John Smith",
         amount: 50000,
         status: "pending",
         createdAt: "2025-01-10T10:00:00.000Z",
     },
     {
-        id: "2",
+        id: 2,
         applicant: "Sarah Johnson",
         amount: 150000,
         status: "under_review",
@@ -18,67 +25,69 @@ const loans: LoanApplication[] = [
     },
 ];
 
-export const healthCheck = (_req: Request, res: Response): void => {
-    res.status(200).json({
-        success: true,
-        message: "API is running",
-    });
-};
-
 export const getAllLoans = (_req: Request, res: Response): void => {
     res.status(200).json({
-        success: true,
+        message: "Loan applications retrieved",
+        count: loans.length,
         data: loans,
     });
 };
 
 export const getLoanById = (req: Request, res: Response): void => {
-    const { id } = req.params;
-    const loan = loans.find((l) => l.id === id);
+    const id = Number(req.params.id);
+    const loan = loans.find((item) => item.id === id);
 
     if (!loan) {
         res.status(404).json({
             success: false,
-            message: "Loan application not found",
+            error: {
+                message: "Loan application not found",
+                code: "LOAN_NOT_FOUND",
+            },
+            timestamp: new Date().toISOString(),
         });
         return;
     }
 
     res.status(200).json({
-        success: true,
+        message: "Loan application retrieved",
         data: loan,
     });
 };
 
 export const createLoan = (req: Request, res: Response): void => {
-    const { applicant, amount, status } = req.body;
+    const { applicant, amount } = req.body;
 
     const newLoan: LoanApplication = {
-        id: String(loans.length + 1),
+        id: loans.length > 0 ? loans[loans.length - 1].id + 1 : 1,
         applicant,
         amount,
-        status,
+        status: "pending",
         createdAt: new Date().toISOString(),
     };
 
     loans.push(newLoan);
 
     res.status(201).json({
-        success: true,
+        message: "Loan application created",
         data: newLoan,
     });
 };
 
 export const updateLoan = (req: Request, res: Response): void => {
-    const { id } = req.params;
+    const id = Number(req.params.id);
     const { applicant, amount, status } = req.body;
 
-    const loan = loans.find((l) => l.id === id);
+    const loan = loans.find((item) => item.id === id);
 
     if (!loan) {
         res.status(404).json({
             success: false,
-            message: "Loan application not found",
+            error: {
+                message: "Loan application not found",
+                code: "LOAN_NOT_FOUND",
+            },
+            timestamp: new Date().toISOString(),
         });
         return;
     }
@@ -88,27 +97,30 @@ export const updateLoan = (req: Request, res: Response): void => {
     loan.status = status ?? loan.status;
 
     res.status(200).json({
-        success: true,
+        message: "Loan application updated",
         data: loan,
     });
 };
 
 export const deleteLoan = (req: Request, res: Response): void => {
-    const { id } = req.params;
-    const index = loans.findIndex((l) => l.id === id);
+    const id = Number(req.params.id);
+    const loanIndex = loans.findIndex((item) => item.id === id);
 
-    if (index === -1) {
+    if (loanIndex === -1) {
         res.status(404).json({
             success: false,
-            message: "Loan application not found",
+            error: {
+                message: "Loan application not found",
+                code: "LOAN_NOT_FOUND",
+            },
+            timestamp: new Date().toISOString(),
         });
         return;
     }
 
-    const deletedLoan = loans.splice(index, 1);
+    loans.splice(loanIndex, 1);
 
     res.status(200).json({
-        success: true,
-        data: deletedLoan[0],
+        message: "Loan application deleted",
     });
 };
