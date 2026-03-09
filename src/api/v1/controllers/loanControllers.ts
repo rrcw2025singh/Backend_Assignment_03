@@ -56,7 +56,19 @@ export const getLoanById = (req: Request, res: Response): void => {
 };
 
 export const createLoan = (req: Request, res: Response): void => {
-    const { applicant, amount } = req.body;
+    const { applicant, amount } = req.body ?? {};
+
+    if (applicant === undefined || amount === undefined) {
+        res.status(400).json({
+            success: false,
+            error: {
+                message: "Applicant and amount are required",
+                code: "REQUIRED_FIELDS_MISSING",
+            },
+            timestamp: new Date().toISOString(),
+        });
+        return;
+    }
 
     const newLoan: LoanApplication = {
         id: loans.length > 0 ? loans[loans.length - 1].id + 1 : 1,
@@ -76,7 +88,7 @@ export const createLoan = (req: Request, res: Response): void => {
 
 export const updateLoan = (req: Request, res: Response): void => {
     const id = Number(req.params.id);
-    const { applicant, amount, status } = req.body;
+    const { applicant, amount, status } = req.body ?? {};
 
     const loan = loans.find((item) => item.id === id);
 
@@ -86,6 +98,22 @@ export const updateLoan = (req: Request, res: Response): void => {
             error: {
                 message: "Loan application not found",
                 code: "LOAN_NOT_FOUND",
+            },
+            timestamp: new Date().toISOString(),
+        });
+        return;
+    }
+
+    if (
+        applicant === undefined &&
+        amount === undefined &&
+        status === undefined
+    ) {
+        res.status(400).json({
+            success: false,
+            error: {
+                message: "Request body is required",
+                code: "REQUEST_BODY_REQUIRED",
             },
             timestamp: new Date().toISOString(),
         });
