@@ -1,39 +1,22 @@
-import { Request, Response, NextFunction } from "express";
-import { AppError } from "../errors/errors";
-import { HTTP_STATUS } from "../../../constants/httpConstants";
-import { errorResponse } from "../models/responseModel";
+import { NextFunction, Request, Response } from "express";
+import { logger } from "../middleware/logger";
 
-const errorHandler = (
-    err: Error | null,
-    _req: Request,
+export const errorHandler = (
+    error: any,
+    req: Request,
     res: Response,
     _next: NextFunction
 ): void => {
-    if (!err) {
-        console.error("Error: null or undefined error received");
+    const statusCode = error.statusCode || 500;
 
-        res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json(
-            errorResponse("An unexpected error occurred", "UNKNOWN_ERROR")
-        );
-        return;
+    logger.error(`${req.method} ${req.originalUrl} -> ${statusCode} - ${error.message}`);
+
+    if (error.stack) {
+        logger.error(error.stack);
     }
 
-    console.error(`Error: ${err.message}`);
-
-    if (process.env.NODE_ENV !== "production") {
-        console.error(`Stack: ${err.stack}`);
-    }
-
-    if (err instanceof AppError) {
-        res.status(err.statusCode).json(
-            errorResponse(err.message, err.code)
-        );
-        return;
-    }
-
-    res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json(
-        errorResponse("An unexpected error occurred", "UNKNOWN_ERROR")
-    );
+    res.status(statusCode).json({
+        success: false,
+        message: error.message || "Internal Server Error"
+    });
 };
-
-export default errorHandler;
