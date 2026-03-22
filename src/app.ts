@@ -1,18 +1,23 @@
 import express from "express";
-import { consoleLogger } from "./api/v1/middleware/logger";
-import errorHandler from "./api/v1/middleware/errorHandler";
+
 import healthRoutes from "./api/v1/routes/healthRoutes";
 import loanRoutes from "./api/v1/routes/loanRoutes";
+import { errorHandler } from "./api/v1/middleware/errorHandler";
+import { httpLogger, consoleHttpLogger } from "./api/v1/middleware/httpLogger";
 
 const app = express();
-app.use(errorHandler);
 
-app.use(consoleLogger);
+app.use(httpLogger);
+
+if (process.env.NODE_ENV !== "production") {
+    app.use(consoleHttpLogger);
+}
 
 app.use(express.json());
 
-app.use("/api/v1", healthRoutes);
+app.use("/api/v1/health", healthRoutes);
+app.use("/api/v1/loans", loanRoutes);
 
-app.use("/api/v1", loanRoutes);
+app.use(errorHandler);
 
 export default app;
