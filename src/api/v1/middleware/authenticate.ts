@@ -1,33 +1,26 @@
-import { NextFunction, Request, Response } from "express";
+import { NextFunction, Response } from "express";
 import { auth } from "../../../config/firebaseConfig";
-
-export interface AuthenticatedRequest extends Request {
-  user?: {
-    uid: string;
-    email?: string;
-    admin?: boolean;
-    role?: string;
-    [key: string]: unknown;
-  };
-}
+import { AuthenticationError } from "../errors/errors";
+import { AuthenticatedRequest } from "../types/authTypes";
 
 export const authenticate = async (
   req: AuthenticatedRequest,
-  res: Response,
+  _res: Response,
   next: NextFunction
 ): Promise<void> => {
   try {
     const authHeader = req.headers.authorization;
 
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
-      res.status(401).json({
-        success: false,
-        message: "Missing or invalid authorization token",
-      });
-      return;
+      return next(new AuthenticationError("Missing or invalid authorization token"));
     }
 
     const idToken = authHeader.split("Bearer ")[1];
+
+    if (!idToken) {
+      return next(new AuthenticationError("Authorization token is missing"));
+    }
+
     const decodedToken = await auth.verifyIdToken(idToken);
 
     req.user = {
@@ -38,10 +31,15 @@ export const authenticate = async (
     };
 
     next();
-  } catch (error) {
-    res.status(401).json({
-      success: false,
-      message: "Unauthorized",
-    });
+  } catch (error: any) {
+    if (error?.code === "auth/id-token-expired") {
+      return next(new AuthenticationError("Token has expired"));
+    }
+
+    if (error?.code === "auth/argument-error") {
+      return next(new AuthenticationError("Invalid authorization token"));
+    }
+
+    return next(new AuthenticationError("Unauthorized"));
   }
 };

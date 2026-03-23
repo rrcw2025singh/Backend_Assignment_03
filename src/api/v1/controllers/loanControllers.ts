@@ -44,6 +44,14 @@ export const getLoanById = (
 ): void => {
     try {
         const id = Number(req.params.id);
+
+        if (Number.isNaN(id)) {
+            throw new ValidationError(
+                "Loan id must be a valid number",
+                "INVALID_LOAN_ID"
+            );
+        }
+
         const loan = loans.find((item) => item.id === id);
 
         if (!loan) {
@@ -77,9 +85,23 @@ export const createLoan = (
             );
         }
 
+        if (typeof applicant !== "string" || applicant.trim() === "") {
+            throw new ValidationError(
+                "Applicant must be a non-empty string",
+                "INVALID_APPLICANT"
+            );
+        }
+
+        if (typeof amount !== "number" || amount <= 0) {
+            throw new ValidationError(
+                "Amount must be a number greater than 0",
+                "INVALID_AMOUNT"
+            );
+        }
+
         const newLoan: LoanApplication = {
             id: loans.length > 0 ? loans[loans.length - 1].id + 1 : 1,
-            applicant,
+            applicant: applicant.trim(),
             amount,
             status: "pending",
             createdAt: new Date().toISOString(),
@@ -105,6 +127,13 @@ export const updateLoan = (
         const id = Number(req.params.id);
         const { applicant, amount, status } = req.body ?? {};
 
+        if (Number.isNaN(id)) {
+            throw new ValidationError(
+                "Loan id must be a valid number",
+                "INVALID_LOAN_ID"
+            );
+        }
+
         const loan = loans.find((item) => item.id === id);
 
         if (!loan) {
@@ -125,9 +154,44 @@ export const updateLoan = (
             );
         }
 
-        loan.applicant = applicant ?? loan.applicant;
-        loan.amount = amount ?? loan.amount;
-        loan.status = status ?? loan.status;
+        if (applicant !== undefined) {
+            if (typeof applicant !== "string" || applicant.trim() === "") {
+                throw new ValidationError(
+                    "Applicant must be a non-empty string",
+                    "INVALID_APPLICANT"
+                );
+            }
+            loan.applicant = applicant.trim();
+        }
+
+        if (amount !== undefined) {
+            if (typeof amount !== "number" || amount <= 0) {
+                throw new ValidationError(
+                    "Amount must be a number greater than 0",
+                    "INVALID_AMOUNT"
+                );
+            }
+            loan.amount = amount;
+        }
+
+        if (status !== undefined) {
+            const validStatuses: LoanApplication["status"][] = [
+                "pending",
+                "under_review",
+                "flagged",
+                "approved",
+                "rejected",
+            ];
+
+            if (!validStatuses.includes(status)) {
+                throw new ValidationError(
+                    "Status is invalid",
+                    "INVALID_STATUS"
+                );
+            }
+
+            loan.status = status;
+        }
 
         res.status(200).json({
             message: "Loan application updated",
@@ -145,6 +209,14 @@ export const deleteLoan = (
 ): void => {
     try {
         const id = Number(req.params.id);
+
+        if (Number.isNaN(id)) {
+            throw new ValidationError(
+                "Loan id must be a valid number",
+                "INVALID_LOAN_ID"
+            );
+        }
+
         const loanIndex = loans.findIndex((item) => item.id === id);
 
         if (loanIndex === -1) {

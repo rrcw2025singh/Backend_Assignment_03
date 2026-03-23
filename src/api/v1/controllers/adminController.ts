@@ -1,27 +1,21 @@
-import { Request, Response } from "express";
+import { Request, Response, NextFunction } from "express";
 import { setUserRole } from "../services/userServices";
+import { ValidationError } from "../errors/errors";
 
 export const assignRole = async (
   req: Request,
-  res: Response
+  res: Response,
+  next: NextFunction
 ): Promise<void> => {
   try {
     const { uid, role } = req.body;
 
     if (!uid || !role) {
-      res.status(400).json({
-        success: false,
-        message: "uid and role are required",
-      });
-      return;
+      return next(new ValidationError("uid and role are required"));
     }
 
     if (role !== "admin" && role !== "user") {
-      res.status(400).json({
-        success: false,
-        message: "role must be either 'admin' or 'user'",
-      });
-      return;
+      return next(new ValidationError("role must be either 'admin' or 'user'"));
     }
 
     const result = await setUserRole(uid, role);
@@ -32,9 +26,6 @@ export const assignRole = async (
       data: result,
     });
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "Failed to assign role",
-    });
+    next(error);
   }
 };

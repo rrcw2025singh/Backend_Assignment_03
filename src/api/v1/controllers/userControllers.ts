@@ -1,18 +1,16 @@
-import { Response } from "express";
-import { AuthenticatedRequest } from "../middleware/authenticate";
+import { Response, NextFunction } from "express";
+import { AuthenticatedRequest } from "../types/authTypes";
 import { getUserDetails } from "../services/userServices";
+import { AuthenticationError } from "../errors/errors";
 
 export const getMyDetails = async (
   req: AuthenticatedRequest,
-  res: Response
+  res: Response,
+  next: NextFunction
 ): Promise<void> => {
   try {
     if (!req.user?.uid) {
-      res.status(401).json({
-        success: false,
-        message: "Unauthorized",
-      });
-      return;
+      return next(new AuthenticationError("Unauthorized"));
     }
 
     const user = await getUserDetails(req.user.uid);
@@ -22,9 +20,6 @@ export const getMyDetails = async (
       data: user,
     });
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "Failed to retrieve user details",
-    });
+    next(error);
   }
 };
