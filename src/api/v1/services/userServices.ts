@@ -1,5 +1,7 @@
 import { auth } from "../../../config/firebaseConfig";
 
+export type UserRole = "admin" | "user";
+
 export const getUserDetails = async (uid: string) => {
   const userRecord = await auth.getUser(uid);
 
@@ -13,7 +15,7 @@ export const getUserDetails = async (uid: string) => {
   };
 };
 
-export const setUserRole = async (uid: string, role: string) => {
+export const setUserRole = async (uid: string, role: UserRole) => {
   const claims =
     role === "admin"
       ? { admin: true, role: "admin" }

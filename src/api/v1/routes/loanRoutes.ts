@@ -1,18 +1,18 @@
 import { Router } from "express";
 import {
-    createLoan,
-    deleteLoan,
-    getAllLoans,
-    getLoanById,
-    updateLoan,
+  createLoan,
+  deleteLoan,
+  getAllLoans,
+  getLoanById,
+  updateLoan,
 } from "../controllers/loanControllers";
 
 const router: Router = Router();
 
-router.get("/loans", getAllLoans);
-router.get("/loans/:id", getLoanById);
-router.post("/loans", createLoan);
-router.put("/loans/:id", updateLoan);
-router.delete("/loans/:id", deleteLoan);
+router.get("/", getAllLoans);
+router.get("/:id", getLoanById);
+router.post("/", createLoan);
+router.put("/:id", updateLoan);
+router.delete("/:id", deleteLoan);
 
 export default router;
