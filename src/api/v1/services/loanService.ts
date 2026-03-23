@@ -2,13 +2,13 @@ import { LoanApplication } from "../models/loanModel";
 
 let loans: LoanApplication[] = [
   {
-    id: "1",
+    id: 1,
     applicant: "John Doe",
     amount: 5000,
     status: "pending",
   },
   {
-    id: "2",
+    id: 2,
     applicant: "Jane Smith",
     amount: 8000,
     status: "approved",
@@ -19,7 +19,7 @@ export const getAllLoans = (): LoanApplication[] => {
   return loans;
 };
 
-export const getLoanById = (id: string): LoanApplication | undefined => {
+export const getLoanById = (id: number): LoanApplication | undefined => {
   return loans.find((loan) => loan.id === id);
 };
 
@@ -27,7 +27,7 @@ export const createLoan = (
   loanData: Omit<LoanApplication, "id">
 ): LoanApplication => {
   const newLoan: LoanApplication = {
-    id: String(loans.length > 0 ? Number(loans[loans.length - 1].id) + 1 : 1),
+    id: loans.length > 0 ? loans[loans.length - 1].id + 1 : 1,
     ...loanData,
   };
 
@@ -36,7 +36,7 @@ export const createLoan = (
 };
 
 export const updateLoan = (
-  id: string,
+  id: number,
   updatedData: Partial<Omit<LoanApplication, "id">>
 ): LoanApplication | undefined => {
   const loan = loans.find((item) => item.id === id);
@@ -49,7 +49,7 @@ export const updateLoan = (
   return loan;
 };
 
-export const deleteLoan = (id: string): boolean => {
+export const deleteLoan = (id: number): boolean => {
   const index = loans.findIndex((loan) => loan.id === id);
 
   if (index === -1) {

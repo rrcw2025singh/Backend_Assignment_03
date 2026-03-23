@@ -10,7 +10,7 @@ export const getAllLoans = (
     const loans = loanService.getAllLoans();
 
     res.status(200).json({
-      success: true,
+      message: "Loan applications retrieved",
       data: loans,
     });
   } catch (error) {
@@ -24,7 +24,9 @@ export const getLoanById = (
   next: NextFunction
 ): void => {
   try {
-    const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+    const idParam = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+    const id = Number(idParam);
+
     const loan = loanService.getLoanById(id);
 
     if (!loan) {
@@ -38,7 +40,7 @@ export const getLoanById = (
     }
 
     res.status(200).json({
-      success: true,
+      message: "Loan application retrieved",
       data: loan,
     });
   } catch (error) {
@@ -55,7 +57,7 @@ export const createLoan = (
     const newLoan = loanService.createLoan(req.body);
 
     res.status(201).json({
-      success: true,
+      message: "Loan application created",
       data: newLoan,
     });
   } catch (error) {
@@ -79,7 +81,9 @@ export const updateLoan = (
       return;
     }
 
-    const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+    const idParam = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+    const id = Number(idParam);
+
     const updatedLoan = loanService.updateLoan(id, req.body);
 
     if (!updatedLoan) {
@@ -93,7 +97,7 @@ export const updateLoan = (
     }
 
     res.status(200).json({
-      success: true,
+      message: "Loan application updated",
       data: updatedLoan,
     });
   } catch (error) {
@@ -107,7 +111,9 @@ export const deleteLoan = (
   next: NextFunction
 ): void => {
   try {
-    const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+    const idParam = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+    const id = Number(idParam);
+
     const deleted = loanService.deleteLoan(id);
 
     if (!deleted) {
@@ -121,8 +127,7 @@ export const deleteLoan = (
     }
 
     res.status(200).json({
-      success: true,
-      message: "Loan deleted successfully",
+      message: "Loan application deleted",
     });
   } catch (error) {
     next(error);

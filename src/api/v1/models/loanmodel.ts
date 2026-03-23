@@ -1,5 +1,5 @@
 export interface LoanApplication {
-  id: string;
+  id: number;
   applicant: string;
   amount: number;
   status: "pending" | "under_review" | "flagged" | "approved" | "rejected";
