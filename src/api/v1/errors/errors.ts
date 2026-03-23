@@ -1,74 +1,34 @@
-import { HTTP_STATUS } from "../../../constants/httpConstants";
+
 
 export class AppError extends Error {
-    constructor(
-        public message: string,
-        public code: string,
-        public statusCode: number
-    ) {
-        super(message);
-        this.name = this.constructor.name;
-        Object.setPrototypeOf(this, new.target.prototype);
-        Error.captureStackTrace(this, this.constructor);
-    }
-}
+  
+    public statusCode: number;
+  public code: string;
+  public details?: unknown;
 
-export class RepositoryError extends AppError {
-    constructor(
-        message: string,
-        code: string,
-        statusCode: number = HTTP_STATUS.INTERNAL_SERVER_ERROR
-    ) {
-        super(message, code, statusCode);
-    }
-}
-
-export class ServiceError extends AppError {
-    constructor(
-        message: string,
-        code: string = "SERVICE_ERROR",
-        statusCode: number = HTTP_STATUS.INTERNAL_SERVER_ERROR
-    ) {
-        super(message, code, statusCode);
-    }
+  constructor(message: string, statusCode = 500, code = "INTERNAL_ERROR", details?: unknown) {
+    super(message);
+    this.statusCode = statusCode;
+    this.code = code;
+    this.details = details;
+    Object.setPrototypeOf(this, new.target.prototype);
+  }
 }
 
 export class AuthenticationError extends AppError {
-    constructor(
-        message: string,
-        code: string = "AUTHENTICATION_ERROR",
-        statusCode: number = HTTP_STATUS.UNAUTHORIZED
-    ) {
-        super(message, code, statusCode);
-    }
+  constructor(message = "Authentication failed", details?: unknown) {
+    super(message, 401, "AUTHENTICATION_ERROR", details);
+  }
 }
 
 export class AuthorizationError extends AppError {
-    constructor(
-        message: string,
-        code: string = "AUTHORIZATION_ERROR",
-        statusCode: number = HTTP_STATUS.FORBIDDEN
-    ) {
-        super(message, code, statusCode);
-    }
+  constructor(message = "Access denied", details?: unknown) {
+    super(message, 403, "AUTHORIZATION_ERROR", details);
+  }
 }
 
 export class ValidationError extends AppError {
-    constructor(
-        message: string,
-        code: string = "VALIDATION_ERROR",
-        statusCode: number = HTTP_STATUS.BAD_REQUEST
-    ) {
-        super(message, code, statusCode);
-    }
-}
-
-export class NotFoundError extends AppError {
-    constructor(
-        message: string,
-        code: string = "NOT_FOUND",
-        statusCode: number = HTTP_STATUS.NOT_FOUND
-    ) {
-        super(message, code, statusCode);
-    }
+  constructor(message = "Validation failed", details?: unknown) {
+    super(message, 400, "VALIDATION_ERROR", details);
+  }
 }
