@@ -1,58 +1,39 @@
 export class AppError extends Error {
-    public statusCode: number;
-    public errorCode: string;
-    public details?: unknown;
+  public statusCode: number;
+  public code: string;
+  public isOperational: boolean;
 
-    constructor(
-        message: string,
-        statusCode: number,
-        errorCode: string,
-        details?: unknown
-    ) {
-        super(message);
-        this.statusCode = statusCode;
-        this.errorCode = errorCode;
-        this.details = details;
-        Object.setPrototypeOf(this, new.target.prototype);
-    }
+  constructor(message: string, statusCode: number, code: string) {
+    super(message);
+    this.statusCode = statusCode;
+    this.code = code;
+    this.isOperational = true;
+
+    Object.setPrototypeOf(this, new.target.prototype);
+    Error.captureStackTrace(this);
+  }
 }
 
 export class ValidationError extends AppError {
-    constructor(
-        message = "Validation failed",
-        errorCode = "VALIDATION_ERROR",
-        details?: unknown
-    ) {
-        super(message, 400, errorCode, details);
-    }
-}
-
-export class AuthenticationError extends AppError {
-    constructor(
-        message = "Authentication failed",
-        errorCode = "AUTHENTICATION_ERROR",
-        details?: unknown
-    ) {
-        super(message, 401, errorCode, details);
-    }
-}
-
-export class AuthorizationError extends AppError {
-    constructor(
-        message = "Access denied",
-        errorCode = "AUTHORIZATION_ERROR",
-        details?: unknown
-    ) {
-        super(message, 403, errorCode, details);
-    }
+  constructor(message = "Validation failed", code = "VALIDATION_ERROR") {
+    super(message, 400, code);
+  }
 }
 
 export class NotFoundError extends AppError {
-    constructor(
-        message = "Resource not found",
-        errorCode = "NOT_FOUND",
-        details?: unknown
-    ) {
-        super(message, 404, errorCode, details);
-    }
+  constructor(message = "Resource not found", code = "RESOURCE_NOT_FOUND") {
+    super(message, 404, code);
+  }
+}
+
+export class AuthenticationError extends AppError {
+  constructor(message = "Authentication failed", code = "AUTHENTICATION_ERROR") {
+    super(message, 401, code);
+  }
+}
+
+export class AuthorizationError extends AppError {
+  constructor(message = "Access denied", code = "AUTHORIZATION_ERROR") {
+    super(message, 403, code);
+  }
 }

@@ -1,9 +1,18 @@
 import { Router } from "express";
-import { getMyDetails } from "../controllers/userControllers";
-import { authenticate } from "../middleware/authenticate";
+import {
+  createLoan,
+  deleteLoan,
+  getAllLoans,
+  getLoanById,
+  updateLoan,
+} from "../controllers/loanControllers";
 
-const router = Router();
+const router: Router = Router();
 
-router.get("/me", authenticate, getMyDetails);
+router.get("/", getAllLoans);
+router.get("/:id", getLoanById);
+router.post("/", createLoan);
+router.put("/:id", updateLoan);
+router.delete("/:id", deleteLoan);
 
 export default router;

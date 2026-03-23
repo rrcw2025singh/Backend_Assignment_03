@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import { setUserRole } from "../services/userServices";
+import { setUserRole } from "../services/userServiceTemp";
 import { ValidationError } from "../errors/errors";
 
 export const assignRole = async (
@@ -15,15 +15,24 @@ export const assignRole = async (
     }
 
     if (role !== "admin" && role !== "user") {
-      return next(new ValidationError("role must be either 'admin' or 'user'"));
+      return next(new ValidationError("role must be either admin or user"));
     }
 
-    const result = await setUserRole(uid, role);
+    const updatedUser = await setUserRole(uid, role);
+
+    if (!updatedUser) {
+      res.status(404).json({
+        error: {
+          code: "USER_NOT_FOUND",
+          message: "User not found",
+        },
+      });
+      return;
+    }
 
     res.status(200).json({
       success: true,
-      message: `Role '${role}' assigned successfully`,
-      data: result,
+      data: updatedUser,
     });
   } catch (error) {
     next(error);
